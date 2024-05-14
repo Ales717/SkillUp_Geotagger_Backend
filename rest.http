@@ -1,2 +1,6 @@
 ### GET /
 GET http://localhost:8080 HTTP/1.1
+
+
+### GET /location/random
+GET http://localhost:8080/locations/random HTTP/1.1
