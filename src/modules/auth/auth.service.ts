@@ -4,12 +4,14 @@ import { AuthEntity } from 'src/entities/auth.entity'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
 import { UserEntity } from 'src/entities/user.entity'
+import Logging from 'src/library/Logging'
 
 @Injectable()
 export class AuthService {
     constructor(private prisma: PrismaService, private jwtService: JwtService) { }
 
     async login(email: string, password: string): Promise<AuthEntity> {
+        Logging.log('Validating user...')
         const user = await this.prisma.user.findUnique({ where: { email: email } })
         if (!user) {
             throw new NotFoundException(`No user found for email: ${email}`)
@@ -19,6 +21,7 @@ export class AuthService {
         if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid password')
         }
+        Logging.log('User is valid.')
         return {
             accessToken: this.jwtService.sign({ userId: user.id }),
         }

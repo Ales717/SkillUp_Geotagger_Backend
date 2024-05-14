@@ -18,6 +18,20 @@ async function main() {
 
     })
 
+    /* const location1 = await prisma.location.upsert({
+        where: { image: 'test' },
+        update: {
+
+            user_id: user1.id,
+        },
+        create: {
+            image: 'test',
+            latitude: 1.0202,
+            longitude: 232.312,
+            user_id: user1.id
+        }
+    }) */
+
     console.log({ user1 });
 
 }
