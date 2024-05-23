@@ -19,6 +19,7 @@ model User {
   password   String
   first_name String?
   last_name  String?
+  avatar     String?
   points     Int        @default(10)
   role       Role       @default(USER)
   locations  Location[]

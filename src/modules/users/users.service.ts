@@ -42,4 +42,12 @@ export class UsersService {
   remove(id: string) {
     return this.prisma.user.delete({ where: { id } })
   }
+
+  async updateAvatar(id: string, filePath: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { avatar: filePath },
+    })
+  }
+
 }

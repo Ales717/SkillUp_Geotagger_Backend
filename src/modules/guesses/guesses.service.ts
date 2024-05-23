@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGuessDto } from './dto/create-guess.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { error } from 'console';
 
 @Injectable()
 export class GuessesService {
@@ -25,6 +26,7 @@ export class GuessesService {
   findAllLocation(location_id: string) {
     return this.prisma.guess.findMany({
       where: { location_id },
+      orderBy: { error_distance: 'desc' },
       take: 10
     })
   }
