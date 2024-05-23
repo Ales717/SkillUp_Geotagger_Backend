@@ -22,21 +22,34 @@ model User {
   points     Int        @default(10)
   role       Role       @default(USER)
   locations  Location[]
+  guesses    Guess[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now()) @updatedAt
+}
 
+model Location {
+  id        String   @id @default(uuid())
+  image     String
+  latitude  Float
+  longitude Float
+  user      User     @relation(fields: [user_id], references: [id])
+  user_id   String
+  Guess     Guess[]
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
 
-model Location {
-  id        String @id @default(uuid())
-  image     String
-  latitude  Float
-  longitude Float
-  user      User   @relation(fields: [user_id], references: [id])
-  user_id   String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+model Guess {
+  id             String   @id @default(uuid())
+  latitude       Float
+  longitude      Float
+  error_distance Float
+  user           User     @relation(fields: [user_id], references: [id])
+  user_id        String
+  location       Location @relation(fields: [location_id], references: [id])
+  location_id    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
 }
 
 enum Role {

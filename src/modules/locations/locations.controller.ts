@@ -21,6 +21,21 @@ export class LocationsController {
     return this.locationsService.create(createLocationDto)
   }
 
+  @Get('rand')
+  async rand() {
+    const locations = await this.locationsService.findAll()
+    const count = locations.length
+
+    if (count === 0) {
+      return []
+    }
+
+    const randomIndex = Math.floor(Math.random() * count)
+    const randomLocation = locations[randomIndex]
+
+    return [randomLocation]
+  }
+
   @Get(':page')
   async findAllPage(@Query('page') page: number): Promise<PeginatedResult> {
     return this.locationsService.paginate(page, ['user'])
@@ -40,6 +55,8 @@ export class LocationsController {
   findOne(@Param('id') id: string) {
     return this.locationsService.findOne(id)
   }
+
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateLocationDto: UpdateLocationDto) {

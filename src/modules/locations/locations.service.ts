@@ -4,10 +4,14 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PeginatedResult } from 'src/interfaces/peginated-result.interface';
 import { LocationEntity } from 'src/entities/location.entity';
+import prismaRandom from 'prisma-extension-random'
+import Logging from 'src/library/Logging';
+
 
 @Injectable()
 export class LocationsService {
   constructor(private prisma: PrismaService) { }
+
 
   create(createLocationDto: CreateLocationDto) {
     return this.prisma.location.create({
@@ -29,7 +33,7 @@ export class LocationsService {
   }
 
   findOne(id: string) {
-    return this.prisma.location.findUnique({ where: { id } })
+    return this.prisma.location.findFirst({ where: { id } })
   }
 
   update(id: string, updateLocationDto: UpdateLocationDto) {
@@ -38,6 +42,7 @@ export class LocationsService {
       data: updateLocationDto,
     })
   }
+
 
   remove(id: string) {
     return this.prisma.location.delete({ where: { id } })
@@ -83,5 +88,5 @@ export class LocationsService {
       data: { image },
     })
   }
-  d
+
 }
