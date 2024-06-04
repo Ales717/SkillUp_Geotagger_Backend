@@ -41,6 +41,18 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto)
   }
 
+  @Patch('pointsAdd/:id')
+  @ApiCreatedResponse({ type: UserEntity })
+  addPoints(@Param('id') id: string) {
+    return this.usersService.addPoints(id)
+  }
+
+  @Patch('pointsRemove/:id/:points')
+  @ApiCreatedResponse({ type: UserEntity })
+  removePoints(@Param('id') id: string, @Param('points') points: number) {
+    return this.usersService.removePoints(id, points)
+  }
+
   @Delete(':id')
   @ApiOkResponse({ type: UserEntity })
   remove(@Param('id') id: string) {
@@ -61,7 +73,7 @@ export class UsersController {
   @ApiCreatedResponse({ description: 'File uploaded successfully' })
   @ApiBadRequestResponse({ description: 'Invalid file upload request' })
   async uploadFile(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
-    const filePath = `./files/${file.filename}`
+    const filePath = `/files/${file.filename}`
     await this.usersService.updateAvatar(id, filePath)
     return { message: 'File uploaded successfully', fileName: file.filename }
   }
