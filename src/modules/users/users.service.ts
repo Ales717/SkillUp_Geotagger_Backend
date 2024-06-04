@@ -39,6 +39,28 @@ export class UsersService {
     return this.prisma.user.update({ where: { id }, data: updateUserDto })
   }
 
+  async addPoints(id: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        points: {
+          increment: 10
+        }
+      }
+    })
+  }
+
+  async removePoints(id: string, points: number) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        points: {
+          increment: -points
+        }
+      }
+    })
+  }
+
   remove(id: string) {
     return this.prisma.user.delete({ where: { id } })
   }

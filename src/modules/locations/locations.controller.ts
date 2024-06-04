@@ -2,13 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseIntercepto
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { LocationsService } from './locations.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { PeginatedResult } from 'src/interfaces/peginated-result.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { isFileExtensionSafe, removeFile, saveImageToStorage } from 'src/helpers/imageStorage';
 import { LocationEntity } from 'src/entities/location.entity';
-import { join } from 'path';
+import { extname, join } from 'path';
 import fs from 'fs';
+import { diskStorage } from 'multer';
+import Logging from 'src/library/Logging';
 
 
 @Controller('locations')
@@ -18,6 +20,7 @@ export class LocationsController {
 
   @Post()
   create(@Body() createLocationDto: CreateLocationDto) {
+    Logging.log('Location controller.')
     return this.locationsService.create(createLocationDto)
   }
 
@@ -68,29 +71,22 @@ export class LocationsController {
     return this.locationsService.remove(id)
   }
 
-  @Post('upload/:id')
-  @HttpCode(HttpStatus.CREATED)
-  async upload(@Body() fileData: any, @Param('id') itemId: string): Promise<LocationEntity> {
-    if (!fileData || !fileData.buffer || !fileData.originalname) {
-      throw new BadRequestException('File must be provided')
-    }
-
-    const filename = `${Date.now()}-${fileData.originalname}`
-    const imagesFolderPath = join(process.cwd(), 'files')
-    const fullImagePath = join(imagesFolderPath, filename)
-
-    try {
-      await fs.promises.writeFile(fullImagePath, fileData.buffer)
-
-      if (await isFileExtensionSafe(fullImagePath)) {
-        return this.locationsService.updateImage(itemId, filename)
-      } else {
-        await fs.promises.unlink(fullImagePath);
-        throw new BadRequestException('File content does not match extension!')
+  @Post('/upload/:id')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './files',
+      filename: (req, file, callback) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = extname(file.originalname);
+        callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
       }
-    } catch (error) {
-      removeFile(fullImagePath)
-      throw new BadRequestException('Error uploading file')
-    }
+    })
+  }))
+  @ApiCreatedResponse({ description: 'File uploaded successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid file upload request' })
+  async uploadFile(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    const filePath = `/files/${file.filename}`
+    await this.locationsService.updateImage(id, filePath)
+    return { message: 'File uploaded successfully', fileName: file.filename }
   }
 }

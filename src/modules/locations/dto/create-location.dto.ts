@@ -4,10 +4,6 @@ import { IsOptional } from 'class-validator';
 export class CreateLocationDto {
     @ApiProperty({ required: false })
     @IsOptional()
-    image?: string
-
-    @ApiProperty({ required: false })
-    @IsOptional()
     latitude?: number
 
     @ApiProperty({ required: false })

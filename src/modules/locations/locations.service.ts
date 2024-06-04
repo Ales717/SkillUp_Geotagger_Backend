@@ -12,11 +12,10 @@ import Logging from 'src/library/Logging';
 export class LocationsService {
   constructor(private prisma: PrismaService) { }
 
-
   create(createLocationDto: CreateLocationDto) {
+    Logging.log('Creating user.')
     return this.prisma.location.create({
       data: {
-        image: createLocationDto.image,
         latitude: createLocationDto.latitude,
         longitude: createLocationDto.longitude,
         user_id: createLocationDto.user_id,
@@ -77,15 +76,10 @@ export class LocationsService {
     }
   }
 
-  async updateImage(id: string, image: string) {
-    const location = await this.prisma.location.findUnique({ where: { id } })
-    if (!location) {
-      throw new BadRequestException('Location not found')
-    }
-
+  async updateImage(id: string, filePath: string) {
     return this.prisma.location.update({
       where: { id },
-      data: { image },
+      data: { image: filePath },
     })
   }
 

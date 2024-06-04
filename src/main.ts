@@ -3,7 +3,7 @@ import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ValidationPipe } from '@nestjs/common'
 import cookieParser from 'cookie-parser'
-import Logging from './library/Logging'
+import express from 'express'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -15,6 +15,8 @@ async function bootstrap() {
   })
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
   app.use(cookieParser())
+
+  app.use('/files', express.static('files'))
 
   const config = new DocumentBuilder()
     .setTitle('Geotagger')
