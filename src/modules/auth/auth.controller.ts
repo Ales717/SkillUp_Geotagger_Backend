@@ -13,11 +13,15 @@ export class AuthController {
   constructor(private authService: AuthService) { }
 
   @Post('login')
-  @ApiOkResponse({ type: AuthEntity })
-  async login(@Body() { email, password }: LoginDto, @Res({ passthrough: true }) res: ExpressResponse) {
-    const accessToken = await this.authService.login(email, password)
-    res.cookie('jwt', accessToken, { httpOnly: true })
-    return accessToken
+  @ApiOkResponse({ type: UserEntity })
+  async login(
+    @Body() { email, password }: LoginDto,
+    @Res({ passthrough: true }) res: ExpressResponse,
+  ): Promise<UserEntity> {
+    const user = await this.authService.login(email, password);
+    res.cookie('jwt', user.accessToken, { httpOnly: true });
+    delete user.accessToken;
+    return user;
   }
 
   @Post('signout')
@@ -33,8 +37,7 @@ export class AuthController {
     if (!cookie) {
       throw new UnauthorizedException('JWT token is missing')
     }
-    const token = cookie.accessToken
-    return this.authService.user(token)
+    return this.authService.user(cookie)
   }
 
 }
