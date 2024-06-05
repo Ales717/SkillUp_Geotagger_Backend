@@ -22,15 +22,18 @@ export class AuthService {
             throw new UnauthorizedException('Invalid password')
         }
         Logging.log('User is valid.')
-        return {
-            accessToken: this.jwtService.sign({ userId: user.id }),
-        }
+        const accessToken = this.jwtService.sign({ userId: user.id });
+        return { ...user, accessToken }
     }
 
 
-    async user(cookie: string): Promise<UserEntity> {
-        const decodedToken = await this.jwtService.verifyAsync(cookie);
-        const userId = decodedToken.userId;
-        return this.prisma.user.findUnique({ where: { id: userId } })
+    async user(token: string): Promise<UserEntity> {
+        const decodedToken = await this.jwtService.verifyAsync(token)
+        const userId = decodedToken.userId
+        const user = await this.prisma.user.findUnique({ where: { id: userId } })
+        if (!user) {
+            throw new NotFoundException('User not found')
+        }
+        return user
     }
 }
